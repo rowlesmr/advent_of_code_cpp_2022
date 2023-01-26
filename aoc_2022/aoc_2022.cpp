@@ -360,9 +360,6 @@ int three_find_duplicate(const std::string& in1, const std::string& in2, const s
 	return 0;
 }
 
-
-
-
 int three_2()
 {
 	int total_priority{ 0 };
@@ -398,6 +395,78 @@ int three_2()
 }
 
 
+int four()
+{
+	int total_overlaps{ 0 };
+
+	std::ifstream file_in("4.txt");
+	if (!file_in)
+	{
+		std::cout << "Couldn't open file.\n";
+		return -1;
+	}
+
+	std::string line;
+	int count{ 0 };
+	std::array<int, 4> sections;
+
+	while (std::getline(file_in, line))
+	{
+		size_t prev{ 0 };
+		size_t pos{};
+		size_t i{ 0 };
+		while ((pos = line.find_first_of("-,", prev)) != std::string::npos)
+		{
+			if (pos > prev)
+				sections[i++] = std::stoi(line.substr(prev, pos - prev));
+			prev = pos + 1;
+		}
+		sections[i++] = std::stoi(line.substr(prev, line.length()-prev));
+
+		if((sections[0] <= sections[2] && sections[1] >= sections[3]) || (sections[0] >= sections[2] && sections[1] <= sections[3])){
+			++total_overlaps;
+		}
+	}
+
+	return total_overlaps;
+}
+
+int four_2()
+{
+	int total_overlaps{ 0 };
+
+	std::ifstream file_in("4.txt");
+	if (!file_in)
+	{
+		std::cout << "Couldn't open file.\n";
+		return -1;
+	}
+
+	std::string line;
+	int count{ 0 };
+	std::array<int, 4> sections;
+
+	while (std::getline(file_in, line))
+	{
+		size_t prev{ 0 };
+		size_t pos{};
+		size_t i{ 0 };
+		while ((pos = line.find_first_of("-,", prev)) != std::string::npos)
+		{
+			if (pos > prev)
+				sections[i++] = std::stoi(line.substr(prev, pos - prev));
+			prev = pos + 1;
+		}
+		sections[i++] = std::stoi(line.substr(prev, line.length() - prev));
+
+		if ((sections[2] <= sections[1] && sections[3] >= sections[0]) || (sections[2] >= sections[1] && sections[3] <= sections[0]))
+		{
+			++total_overlaps;
+		}
+	}
+
+	return total_overlaps;
+}
 
 
 int main()
@@ -408,10 +477,12 @@ int main()
 	//std::cout << " 2 : " << two() << '\n';
 	//std::cout << " 2x: " << two_2() << '\n';
 	//
-	std::cout << " 3 : " << three() << '\n';
-	std::cout << " 3x: " << three_2() << '\n';
+	//std::cout << " 3 : " << three() << '\n';
+	//std::cout << " 3x: " << three_2() << '\n';
 
-	
+	std::cout << " 4 : " << four() << '\n';
+	std::cout << " 4x: " << four_2() << '\n';
+
 
 	return 0;
 }
