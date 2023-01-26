@@ -2,10 +2,84 @@
 //
 
 #include <iostream>
+#include <fstream>
+#include <iterator>
+#include <sstream>
+#include <string>
+#include <vector>
+
+std::vector<std::string> split(const std::string& s)
+{
+	std::stringstream ss{ s };
+	std::vector<std::string> words;
+	for (std::string w; ss >> w; )
+	{
+		std::cout << w << '\n';
+		words.push_back(w);
+	}
+	return words;
+}
+
+
+int one()
+{
+
+	int elf{ 1 };
+	int tot_calories{ 0 };
+
+	int most_elf{ 0 };
+	int most_calories{ 0 };
+
+	std::ifstream file_in("1.txt");
+	if (!file_in)
+	{
+		std::cout << "Couldn't open file.\n";
+		return -1;
+	}
+
+	std::string line;
+	while (std::getline(file_in, line))
+	{
+		std::istringstream iss(line);
+		std::string val{};
+
+		iss >> val;
+
+		if (val.empty())
+		{
+			if (tot_calories > most_calories)
+			{
+				most_calories = tot_calories;
+				most_elf = elf;
+			}
+			elf++;
+			tot_calories = 0;
+		}
+		else
+		{
+			tot_calories += std::stoi(val);
+		}
+	}
+
+	//std::cout << "Elf " << most_elf << " has " << most_calories << " calories.\n";
+
+	return most_calories;
+}
+
+
+
+
+
+
+
+
 
 int main()
 {
-    std::cout << "Hello World!\n";
+	std::cout << " 1: " << one() << '\n';
+
+
+	return 0;
 }
 
 // Run program: Ctrl + F5 or Debug > Start Without Debugging menu
