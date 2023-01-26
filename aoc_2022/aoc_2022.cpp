@@ -382,7 +382,7 @@ int three_2()
 
 		iss >> rucksack;
 		rucksacks[count++] = rucksack;
-		
+
 		if (count == 3)
 		{
 			total_priority += three_find_duplicate(rucksacks[0], rucksacks[1], rucksacks[2]);
@@ -421,9 +421,10 @@ int four()
 				sections[i++] = std::stoi(line.substr(prev, pos - prev));
 			prev = pos + 1;
 		}
-		sections[i++] = std::stoi(line.substr(prev, line.length()-prev));
+		sections[i++] = std::stoi(line.substr(prev, line.length() - prev));
 
-		if((sections[0] <= sections[2] && sections[1] >= sections[3]) || (sections[0] >= sections[2] && sections[1] <= sections[3])){
+		if ((sections[0] <= sections[2] && sections[1] >= sections[3]) || (sections[0] >= sections[2] && sections[1] <= sections[3]))
+		{
 			++total_overlaps;
 		}
 	}
@@ -468,6 +469,172 @@ int four_2()
 	return total_overlaps;
 }
 
+char five_get_box(const std::string& line, const size_t stack_num)
+{
+	return line[4 * stack_num + 1];
+}
+
+
+std::string five()
+{
+	std::ifstream file_in("5.txt");
+	if (!file_in)
+	{
+		std::cout << "Couldn't open file.\n";
+		return "-1";
+	}
+
+	std::string line;
+
+
+	size_t num_stacks{ 0 };
+	std::vector<std::vector<char>> stacks{};
+	bool firstLine{ true };
+	bool readStacks{ true };
+	bool readMoves{ false };
+	while (std::getline(file_in, line))
+	{
+		if (firstLine)
+		{
+			num_stacks = (line.length() + 1) / 4;
+			stacks.resize(num_stacks);
+			for (size_t i{ 0 }; i < num_stacks; ++i)
+			{
+				stacks[i] = {};
+			}
+			firstLine = false;
+		}
+		if (line.empty() || line[1] == '1')
+			readStacks = false;
+		if (line[0] == 'm')
+			readMoves = true;
+
+		if (readStacks)
+		{
+			for (size_t i{ 0 }; i < num_stacks; ++i)
+			{
+				char addMe = five_get_box(line, i);
+				if (addMe != ' ')
+				{
+					stacks[i].insert(stacks[i].begin(), addMe);
+				}
+
+			}
+		}
+
+		if (readMoves)
+		{
+			size_t boxes{ 0 };
+			size_t from{ 0 };
+			size_t to{ 0 };
+			std::string tmp{};
+
+			std::istringstream iss(line);
+			iss >> tmp >> boxes >> tmp >> from >> tmp >> to;
+
+			for (size_t i{ 0 }; i < boxes; ++i)
+			{
+				int move_me = stacks[from - 1][stacks[from - 1].size() - 1];
+				stacks[from - 1].pop_back();
+				stacks[to - 1].push_back(move_me);
+			}
+
+		}
+	}
+
+	std::string answer{};
+	for (size_t i{ 0 }; i < num_stacks; ++i)
+	{
+		answer += stacks[i][stacks[i].size() - 1];
+	}
+
+	return answer;
+}
+
+
+std::string five_2()
+{
+	std::ifstream file_in("5.txt");
+	if (!file_in)
+	{
+		std::cout << "Couldn't open file.\n";
+		return "-1";
+	}
+
+	std::string line;
+
+
+	size_t num_stacks{ 0 };
+	std::vector<std::vector<char>> stacks{};
+	bool firstLine{ true };
+	bool readStacks{ true };
+	bool readMoves{ false };
+	while (std::getline(file_in, line))
+	{
+		if (firstLine)
+		{
+			num_stacks = (line.length() + 1) / 4;
+			stacks.resize(num_stacks);
+			for (size_t i{ 0 }; i < num_stacks; ++i)
+			{
+				stacks[i] = {};
+			}
+			firstLine = false;
+		}
+		if (line.empty() || line[1] == '1')
+			readStacks = false;
+		if (line[0] == 'm')
+			readMoves = true;
+
+		if (readStacks)
+		{
+			for (size_t i{ 0 }; i < num_stacks; ++i)
+			{
+				char addMe = five_get_box(line, i);
+				if (addMe != ' ')
+				{
+					stacks[i].insert(stacks[i].begin(), addMe);
+				}
+
+			}
+		}
+
+		if (readMoves)
+		{
+			size_t boxes{ 0 };
+			size_t from{ 0 };
+			size_t to{ 0 };
+			std::string tmp{};
+
+			std::istringstream iss(line);
+			iss >> tmp >> boxes >> tmp >> from >> tmp >> to;
+
+			for (size_t i{ 0 }; i < boxes; ++i)
+			{
+				int move_me = stacks[from - 1][stacks[from - 1].size() - boxes + i];
+				stacks[to - 1].push_back(move_me);
+			}
+			for (size_t i{ 0 }; i < boxes; ++i)
+			{
+				stacks[from - 1].pop_back();
+			}
+
+		}
+	}
+
+	std::string answer{};
+	for (size_t i{ 0 }; i < num_stacks; ++i)
+	{
+		answer += stacks[i][stacks[i].size() - 1];
+	}
+
+	return answer;
+}
+
+
+
+
+
 
 int main()
 {
@@ -480,9 +647,11 @@ int main()
 	//std::cout << " 3 : " << three() << '\n';
 	//std::cout << " 3x: " << three_2() << '\n';
 
-	std::cout << " 4 : " << four() << '\n';
-	std::cout << " 4x: " << four_2() << '\n';
+	//std::cout << " 4 : " << four() << '\n';
+	//std::cout << " 4x: " << four_2() << '\n';
 
+	std::cout << " 5 : " << five() << '\n';
+	std::cout << " 5x: " << five_2() << '\n';
 
 	return 0;
 }
