@@ -8,6 +8,8 @@
 #include <string>
 #include <vector>
 #include <algorithm>
+#include <iterator>
+#include <array>
 
 std::vector<std::string> split(const std::string& s)
 {
@@ -65,7 +67,6 @@ int one()
 
 	return most_calories;
 }
-
 
 int one_2()
 {
@@ -162,8 +163,6 @@ int two_shape(const char me)
 	return -1;
 }
 
-
-
 int two()
 {
 	int total_score{ 0 };
@@ -252,13 +251,167 @@ int two_2()
 }
 
 
+
+
+int three_char_to_priority(const char in)
+{
+	int val = in + 0;
+
+	if (val < 91)
+		return val - 65 + 27;
+	if (val < 123)
+		return val - 97 + 1;
+
+	return 0;
+}
+
+int three_get_duplicate_priority(std::string& input)
+{
+	/*
+	* The string is guaranteed to be even in length
+	* sort the first half and the second half independently
+	* then find the common character between the two halves.
+	*/
+	auto it{ input.begin() };
+	std::advance(it, input.size() / 2);
+	std::sort(input.begin(), it);
+	std::sort(it, input.end());
+
+	auto first1{ input.begin() };
+	auto first2{ it };
+
+	while (first1 != it && first2 != input.end())
+	{
+		if (*first1 < *first2)
+			++first1;
+		else
+		{
+			if (!(*first2 < *first1))
+				return three_char_to_priority(*first1++); // *first1 and *first2 are equivalent.
+			++first2;
+		}
+	}
+
+	return 0;
+}
+
+
+int three()
+{
+	int total_priority{ 0 };
+
+	std::ifstream file_in("3.txt");
+	if (!file_in)
+	{
+		std::cout << "Couldn't open file.\n";
+		return -1;
+	}
+
+	std::string line;
+	while (std::getline(file_in, line))
+	{
+		std::istringstream iss(line);
+		std::string rucksack{};
+
+		iss >> rucksack;
+
+		total_priority += three_get_duplicate_priority(rucksack);
+	}
+
+	return total_priority;
+
+}
+
+
+int three_find_duplicate(const std::string& in1, const std::string& in2, const std::string& in3)
+{
+	/*
+	* The string is guaranteed to be even in length
+	* sort the first half and the second half independently
+	* then find the common character between the two halves.
+	*/
+	std::string dup{};
+	for (size_t i{ 0 }; i < in1.length(); ++i)
+	{
+		char c1 = in1[i];
+		for (size_t j{ 0 }; j < in2.length(); ++j)
+		{
+			char c2 = in2[j];
+			if (c1 == c2)
+			{
+				dup += c2;
+			}
+		}
+	}
+
+	for (size_t i{ 0 }; i < dup.length(); ++i)
+	{
+		char c1 = dup[i];
+		for (size_t j{ 0 }; j < in3.length(); ++j)
+		{
+			char c2 = in3[j];
+			if (c1 == c2)
+			{
+				return three_char_to_priority(c2);
+			}
+		}
+	}
+
+	return 0;
+}
+
+
+
+
+int three_2()
+{
+	int total_priority{ 0 };
+
+	std::ifstream file_in("3.txt");
+	if (!file_in)
+	{
+		std::cout << "Couldn't open file.\n";
+		return -1;
+	}
+
+	std::string line;
+	int count{ 0 };
+	std::array<std::string, 3> rucksacks;
+
+	while (std::getline(file_in, line))
+	{
+		std::istringstream iss(line);
+		std::string rucksack{};
+
+		iss >> rucksack;
+		rucksacks[count++] = rucksack;
+		
+		if (count == 3)
+		{
+			total_priority += three_find_duplicate(rucksacks[0], rucksacks[1], rucksacks[2]);
+			count = 0;
+		}
+	}
+
+	return total_priority;
+
+}
+
+
+
+
 int main()
 {
 	//std::cout << " 1 : " << one() << '\n';
 	//std::cout << " 1x: " << one_2() << '\n';
+	//
+	//std::cout << " 2 : " << two() << '\n';
+	//std::cout << " 2x: " << two_2() << '\n';
+	//
+	std::cout << " 3 : " << three() << '\n';
+	std::cout << " 3x: " << three_2() << '\n';
 
-	std::cout << " 2 : " << two() << '\n';
-	std::cout << " 2x: " << two_2() << '\n';
+	
 
 	return 0;
 }
