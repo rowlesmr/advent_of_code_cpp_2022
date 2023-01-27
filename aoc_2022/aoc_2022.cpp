@@ -11,6 +11,7 @@
 #include <iterator>
 #include <array>
 
+
 std::vector<std::string> split(const std::string& s)
 {
 	std::stringstream ss{ s };
@@ -633,6 +634,92 @@ std::string five_2()
 
 
 
+template<class Container>
+bool six_are_all_unique(Container input)
+{
+	for (size_t i{ 0 }; i < input.size(); ++i)
+	{
+		for (size_t j{ i + 1 }; j < input.size(); ++j)
+		{
+			if (input[i] == input[j])
+				return false;
+		}
+	}
+	return true;
+}
+
+
+int six()
+{
+	std::ifstream file_in("6.txt");
+	if (!file_in)
+	{
+		std::cout << "Couldn't open file.\n";
+		return -1;
+	}
+
+	std::string line;
+
+	const int MAGIC_NUM{ 4 };
+	std::array<char, MAGIC_NUM> chars;
+	size_t ic{ 0 };
+	char ch;
+	size_t char_num{ 1 };
+	while (file_in.get(ch))
+	{
+		chars[ic++] = ch;
+		
+		if(char_num > MAGIC_NUM && six_are_all_unique(chars)){
+			return char_num;
+		}
+
+
+		if (ic == MAGIC_NUM)
+			ic = 0;
+		++char_num;
+	}
+
+
+	return 0;
+}
+
+int six_2()
+{
+	std::ifstream file_in("6.txt");
+	if (!file_in)
+	{
+		std::cout << "Couldn't open file.\n";
+		return -1;
+	}
+
+	std::string line;
+
+	const int MAGIC_NUM{ 14 };
+	std::array<char, MAGIC_NUM> chars;
+	size_t ic{ 0 };
+	char ch;
+	size_t char_num{ 1 };
+	while (file_in.get(ch))
+	{
+		chars[ic++] = ch;
+
+		if (char_num > MAGIC_NUM && six_are_all_unique(chars))
+		{
+			return char_num;
+		}
+
+
+		if (ic == MAGIC_NUM)
+			ic = 0;
+		++char_num;
+	}
+
+
+	return 0;
+}
+
+
+
 
 
 
@@ -650,8 +737,12 @@ int main()
 	//std::cout << " 4 : " << four() << '\n';
 	//std::cout << " 4x: " << four_2() << '\n';
 
-	std::cout << " 5 : " << five() << '\n';
-	std::cout << " 5x: " << five_2() << '\n';
+	//std::cout << " 5 : " << five() << '\n';
+	//std::cout << " 5x: " << five_2() << '\n';
+
+	std::cout << " 6 : " << six() << '\n';
+	std::cout << " 6x: " << six_2() << '\n';
+
 
 	return 0;
 }
