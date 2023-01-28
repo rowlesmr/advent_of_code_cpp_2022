@@ -10,7 +10,7 @@
 #include <algorithm>
 #include <iterator>
 #include <array>
-
+#include <unordered_map>
 
 std::vector<std::string> split(const std::string& s)
 {
@@ -668,8 +668,9 @@ int six()
 	while (file_in.get(ch))
 	{
 		chars[ic++] = ch;
-		
-		if(char_num > MAGIC_NUM && six_are_all_unique(chars)){
+
+		if (char_num >= MAGIC_NUM && six_are_all_unique(chars))
+		{
 			return char_num;
 		}
 
@@ -703,7 +704,7 @@ int six_2()
 	{
 		chars[ic++] = ch;
 
-		if (char_num > MAGIC_NUM && six_are_all_unique(chars))
+		if (char_num >= MAGIC_NUM && six_are_all_unique(chars))
 		{
 			return char_num;
 		}
@@ -720,6 +721,177 @@ int six_2()
 
 
 
+
+struct Node
+{
+	Node* parent;
+	int size{ 0 };
+	bool isDir{ true };
+	std::string name;
+	std::list<Node> children;
+
+	Node* Parent()
+	{
+		if (parent == nullptr)
+			return this;
+		return parent;
+	}
+
+	int calculate_total_size()
+	{
+		if (size > 0)
+			return size;
+		//otherwise
+		for (Node& c : children)
+		{
+			size += c.calculate_total_size();
+		}
+		return size;
+	}
+
+	int get_total_sizes_LT_100k()
+	{
+		int size = 0;
+		if (isDir && this->size < 100000)
+			size += this->size;
+
+		for (Node& c : children)
+		{
+			size += c.get_total_sizes_LT_100k();
+		}
+		return size;
+	}
+
+	void get_all_directory_sizes(std::vector<int>& sizes)
+	{
+		if (isDir)
+		{
+			sizes.push_back(this->size);
+		}
+		for (Node& c : children)
+		{
+			c.get_all_directory_sizes(sizes);
+		}
+	}
+
+
+};
+
+
+
+int seven()
+{
+	std::ifstream file_in("7.txt");
+	if (!file_in)
+	{
+		std::cout << "Couldn't open file.\n";
+		return -1;
+	}
+
+
+	// Create the tree root
+	Node tree{ nullptr, 0, true, "/" };
+	// Pointer to our current directory
+	Node* currentDir = &tree;
+
+	bool commandMode = true;
+
+	while (file_in)
+	{
+		//if we're in the mode where we're issuing commands to the computer
+		if (commandMode)
+		{
+			char dollar;
+			std::string command;
+			std::string arg;
+			file_in >> dollar >> command;
+
+			if (command == "cd")
+			{
+				file_in >> arg;
+				if (arg == "/")
+				{//going to root
+					currentDir = &tree;
+				}
+				else if (arg == "..")
+				{//going up a level
+					currentDir = currentDir->Parent();
+				}
+				else
+				{ // going into a directory'
+					for (Node& n : currentDir->children)
+					{
+						if (n.name == arg)
+						{
+							currentDir = &n;
+							break;
+						}
+					}
+				}
+
+
+			}
+			else if (command == "ls")
+			{
+				commandMode = false;
+			}
+		}
+		else //otherwise, we're listing files.
+		{
+			std::string command;
+			file_in >> command;
+			if (!file_in) break;
+
+			//if this is true, then we've stopped listing files and have issued a command
+			// this backs up the stream, and we flag it to go to command mode
+			if (command == "$")
+			{
+				file_in.seekg(-2, std::ios::cur); //from the current position, go back 2; ie, the ' ' and the '$'
+				commandMode = true;
+			}
+			else if (command == "dir") //we need to add a directory to the children list
+			{
+				std::string name;
+				file_in >> name;
+				currentDir->children.push_back({ currentDir, 0, true, name });
+			}
+			else //it starts with a number, and is therefore, a file.
+			{
+				int size{ std::stoi(command) };
+				std::string name;
+				file_in >> name;
+				currentDir->children.push_back({ currentDir, size, false, name });
+			}
+		}
+	}
+
+	tree.calculate_total_size();
+
+	int part_1 = tree.get_total_sizes_LT_100k();
+
+
+	std::vector<int> sizes;
+	tree.get_all_directory_sizes(sizes);
+	std::sort(sizes.begin(), sizes.end());
+
+	// Calculate how much space needs to be freed
+	auto unused = 70000000 - tree.size;
+	auto needed = 30000000 - unused;
+
+
+
+	for (int size : sizes)
+	{
+		if (size >= needed)
+		{
+			return size;
+		}
+	}
+
+	return 0;
+
+
+}
 
 
 
@@ -740,9 +912,10 @@ int main()
 	//std::cout << " 5 : " << five() << '\n';
 	//std::cout << " 5x: " << five_2() << '\n';
 
-	std::cout << " 6 : " << six() << '\n';
-	std::cout << " 6x: " << six_2() << '\n';
+	//std::cout << " 6 : " << six() << '\n';
+	//std::cout << " 6x: " << six_2() << '\n';
 
+	std::cout << " 7 : " << seven() << '\n';
 
 	return 0;
 }
